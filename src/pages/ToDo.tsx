@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import TodoCard from "../components/TodoCard";
 import axios from "axios";
 import TaskChart from "../components/TaskChart";
+import PageLayout from "../layout/Layout";
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -20,6 +21,7 @@ const ToDo = () => {
   const completedTasks = todos.filter(todo => todo.completed).length;
 
   return (
+    <PageLayout>
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
       <div className="mb-4 text-lg font-medium">
@@ -57,6 +59,7 @@ const ToDo = () => {
            doneTaskCount = {completedTasks} /> */}
       {selectedTodo && <TodoCard todo={selectedTodo} onClose={() => setSelectedTodo(null)} />}
     </div>
+    </PageLayout>
   );
 };
 
