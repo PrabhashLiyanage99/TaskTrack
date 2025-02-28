@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import Login from './pages/Login'
 import ToDo from './pages/ToDo'
+import ProtectedRoute from './utils/ProtectedRoute'
 
 const App = () => {
   return (
@@ -11,7 +12,9 @@ const App = () => {
         <AuthProvider>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/todo" element={<ToDo />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/todo" element={<ToDo />} />
+          </Route>
         </Routes>
        </AuthProvider>
       </Router>
