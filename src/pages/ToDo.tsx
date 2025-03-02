@@ -29,12 +29,16 @@ const ToDo = () => {
 
   const removeTaskList = (index: number) => {
     setTaskLists(taskLists.filter((_, i) => i !== index));
+    if (selectedList === index){
+      setSelectedList(-1);
+    }
   };
 
   const assignTaskToList = (taskId: number, listIndex: number | null) => {
     setTaskAssignments((prev) => ({ ...prev, [taskId]: listIndex }));
   };
 
+  const filteredTasks = selectedList === -1 ? todos : todos.filter(todo => taskAssignments[todo.id] === selectedList);
 
   return (
     <Layout todos={todos}>
@@ -56,10 +60,16 @@ const ToDo = () => {
                     <th className="p-2">ID</th>
                     <th className="p-2">Title</th>
                     <th className="p-2">Completed</th>
+                    <th className="p-2">Category</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {todos.slice(0, 10).map(todo => (
+                  {filteredTasks.length === 0&& (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-gray-600 font-bold">No tasks in this category</td>
+                    </tr>
+                  )}
+                  {filteredTasks.slice(0, 10).map(todo => (
                     <tr 
                     key={todo.id} 
                     className="cursor-pointer hover:bg-blue-100 transition-all"
@@ -68,17 +78,17 @@ const ToDo = () => {
                       <td className="p-2">{todo.title}</td>
                       <td className="p-2 text-center">{todo.completed ? "✅" : "❌"}</td>
                       <td className="p-2">
-                      <select 
-                        value={taskAssignments[todo.id] ?? ""}
-                        onChange={(e) => assignTaskToList(todo.id, e.target.value ? Number(e.target.value) : null)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-1 rounded border"
-                      >
-                        <option value="">Select</option>
-                        {taskLists.map((list, index) => (
-                          <option key={index} value={index}>{list}</option>
-                        ))}
-                      </select>
+                        <select 
+                          value={taskAssignments[todo.id] ?? ""}
+                          onChange={(e) => assignTaskToList(todo.id, e.target.value ? Number(e.target.value) : null)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 rounded border"
+                        >
+                          <option value="">Select</option>
+                          {taskLists.map((list, index) => (
+                            <option key={index} value={index}>{list}</option>
+                          ))}
+                        </select>
                     </td>
                     </tr>
                   ))}
