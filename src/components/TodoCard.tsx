@@ -1,4 +1,4 @@
-import { FaTimesCircle } from "react-icons/fa";
+
 
 interface TodoCardProps {
   todo: { id: number; title: string; completed: boolean };
