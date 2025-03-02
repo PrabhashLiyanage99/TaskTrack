@@ -4,6 +4,8 @@ import axios from "axios";
 import Layout from "../layout/Layout";
 import TaskChart from "../components/TaskChart";
 import LeftSidebar from "../components/LeftSideBar";
+import AddTaskForm from "../components/AddTaskForm";
+import { title } from "process";
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -37,6 +39,17 @@ const ToDo = () => {
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleAddTask = (title: string, category: string, dueDate: Date) => {
+    const newTask = {
+      id: todos.length + 1,
+      title,
+      completed: false,
+      category,
+      taskDate: dueDate,
+    };
+    setTodos([...todos, newTask]);
+  };
 
   const generateRandomDate = () => {
     const start = new Date(2024, 11, 27);
@@ -128,6 +141,9 @@ const ToDo = () => {
           </div>
         )}
         {selectedTodo && <TodoCard todo={selectedTodo} onClose={() => setSelectedTodo(null)} />}
+      </div>
+      <div>
+        <AddTaskForm taskLists={taskLists} onAddTask={handleAddTask} />
       </div>
     </Layout>
   );
