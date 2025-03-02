@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TodoCard from "../components/TodoCard";
 import axios from "axios";
 import Layout from "../layout/Layout";
+import TaskChart from '../components/TaskChart'
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -15,9 +16,13 @@ const ToDo = () => {
     .finally(() => setLoading(false));
   }, []);
 
+  const totalTasks = todos.length;
+
+  const completedTasks = todos.filter(todo => todo.completed).length;
+
   return (
-    <Layout>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <Layout todos={todos}>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 p-4">
         <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
         {loading ? (
           <p className="text-lg font-medium text-gray-600">Loading...</p> ): (
@@ -43,6 +48,11 @@ const ToDo = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="block lg:hidden">
+                <TaskChart
+                totalTaskCount = {totalTasks}
+                doneTaskCount = {completedTasks} />
+             </div>
           </div>
         )}
         {selectedTodo && <TodoCard todo={selectedTodo} onClose={() => setSelectedTodo(null)} />}

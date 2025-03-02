@@ -32,6 +32,7 @@ const TaskCard: React.FC<TasksChartProps> = ({
         plugins: {
           legend: {
             position: "top" as const,
+            display: false,
           },
           tooltip: {
             enabled: true,
@@ -45,12 +46,16 @@ const TaskCard: React.FC<TasksChartProps> = ({
         <div className="bg-gradient-to-r from-gray-700 to-indigo-900 p-6 pb-8 lg:pb-12 rounded-xl shadow-lg w-full min-h-[150px] flex flex-col justify-between">
           <div className="flex justify-between sm:flex-col md:flex-row">
             <div>
-              <p className="text-sm uppercase text-gray-300 mb-1">Tasks Status</p>
-              <h2 className="text-white font-bold text-2xl">{todoTaskCount}</h2>
+              <p className="text-sm uppercase text-gray-300 mb-1">Total Tasks</p>
+              <h2 className="text-white font-bold text-2xl">{totalTaskCount}</h2>
               <p className="text-sm text-gray-300 mt-9">
-                <span>Done Status</span>
+                <span>Done Tasks</span>
                 <span style={{ fontSize: "18px", color:"#4BC0C0" }} className={`flex items-center `}>
                   <span className="pt-6" /> {doneTaskCount}
+                </span>
+                <span>Todo Tasks</span>
+                <span style={{ fontSize: "18px", color:"#FF6384" }} className={`flex items-center `}>
+                  <span className="pt-6" /> {todoTaskCount}
                 </span>
               </p>
             </div>
