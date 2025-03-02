@@ -3,30 +3,30 @@ import close from "../assets/close.svg";
 import menu from "../assets/menu.svg";
 import add from "../assets/add.svg";
 
-const LeftSidebar: React.FC = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [ newItem, setNewItem ] = useState("");
-    const [ items, setItems ] = useState<string[]>(["Life", "work", "workout"]);
-    const [ isAdding, setIsAdding ] = useState(false);
-    const [ selectedIndex, setSelectedIndex ] = useState<number | null>(null);
+interface LeftSidebarProps {
+    items: string[];
+    addItem: (newItem: string) => void;
+    removeItem: (index: number) => void;
+    selectedIndex: number | null;
+    setSelectedIndex: (index: number | null) => void;
+}
 
-    const addItem = () => {
+const LeftSideBar: React.FC<LeftSidebarProps> = ({ items, addItem, removeItem, selectedIndex, setSelectedIndex }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [newItem, setNewItem] = useState("");
+    const [isAdding, setIsAdding] = useState(false);
+
+
+    const handleAddItem = () => {
         if (newItem.trim() !== "") {
-            setItems([...items, newItem]);
+            addItem(newItem);
             setNewItem("");
         }
-        setIsAdding(false)
-    };
-
-    const removeItem = (index: number) => {
-        setItems(items.filter((_, i) => i !== index));
-        if ( selectedIndex === index) {
-            setSelectedIndex(null);
-        }
+        setIsAdding(false);
     };
 
     return (
-        <>
+ <>
             {!isMenuOpen && (
                 <button
                     className="mt-16 fixed top-4 left-4 bg-gray-800 p-2 rounded-md shadow-md z-50 lg:hidden"
@@ -47,11 +47,12 @@ const LeftSidebar: React.FC = () => {
                     <img src={close} alt="close" className="w-6 h-6" />
                 </button>
 
-                <h2 className="text-lg font-bold mb-4">My List</h2>
+                <h2 className="text-lg font-bold mb-4">Task Lists</h2>
                 <ul>
                     {items.map((item, index) => (
-                        <li key={index}
-                        className={`mb-3 flex justify-between items-center cursor-pointer hover:text-gray-400 pl-2
+                        <li
+                            key={index}
+                            className={`mb-3 flex justify-between items-center cursor-pointer hover:text-gray-400 pl-2
                             ${selectedIndex === index ? "bg-orange-500 text-white p-2 rounded-md pr-0" : ""}`}
                             onClick={() => setSelectedIndex(index)}
                         >
@@ -78,25 +79,25 @@ const LeftSidebar: React.FC = () => {
                     </button>
                 )}
                 {isAdding && (
-                <div className="mt-4">
-                    <input
-                        type="text"
-                        placeholder="New Item"
-                        value={newItem}
-                        onChange={(e) => setNewItem(e.target.value)}
-                        className="w-full p-2 text-black rounded-md"
-                    />
-                    <button
-                        onClick={addItem}
-                        className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-md"
-                    >
-                        Add
-                    </button>
-                </div>
+                    <div className="mt-4">
+                        <input
+                            type="text"
+                            placeholder="New Item"
+                            value={newItem}
+                            onChange={(e) => setNewItem(e.target.value)}
+                            className="w-full p-2 text-black rounded-md"
+                        />
+                        <button
+                            onClick={handleAddItem}
+                            className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-md"
+                        >
+                            Add
+                        </button>
+                    </div>
                 )}
             </div>
         </>
     );
 };
 
-export default LeftSidebar;
+export default LeftSideBar;
