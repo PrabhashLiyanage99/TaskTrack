@@ -13,7 +13,13 @@ interface LayoutProps {
       <div className="flex h-screen bg-gray-800">
 
         <RightSidebar todos={todos} />
-        <LeftSideBar/>
+        <LeftSideBar 
+          items={[]} 
+          addItem={() => {}} 
+          removeItem={() => {}} 
+          selectedIndex={0} 
+          setSelectedIndex={() => {}} 
+        />
         <div className="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
           <Header />
           

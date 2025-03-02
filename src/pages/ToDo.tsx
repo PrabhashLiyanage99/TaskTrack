@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import TodoCard from "../components/TodoCard";
 import axios from "axios";
 import Layout from "../layout/Layout";
 import TaskChart from '../components/TaskChart'
+import LeftSidebar from "../components/LeftSideBar";
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [taskLists, setTaskLists] = useState<string[]>(["Life", "Work", "Workout"]);
+  const [selectedList, setSelectedList] = useState<number | null>(null);
+  const [taskAssignments, setTaskAssignments] = useState<{ [key: number]: number | null }>({});
 
   useEffect(() => {
     axios.get('https://jsonplaceholder.typicode.com/todos')
@@ -17,11 +21,30 @@ const ToDo = () => {
   }, []);
 
   const totalTasks = todos.length;
-
   const completedTasks = todos.filter(todo => todo.completed).length;
+
+  const addTaskList = (newList: string) => {
+    setTaskLists([...taskLists, newList]);
+  };
+
+  const removeTaskList = (index: number) => {
+    setTaskLists(taskLists.filter((_, i) => i !== index));
+  };
+
+  const assignTaskToList = (taskId: number, listIndex: number | null) => {
+    setTaskAssignments((prev) => ({ ...prev, [taskId]: listIndex }));
+  };
+
 
   return (
     <Layout todos={todos}>
+    <LeftSidebar 
+        items={taskLists} 
+        addItem={addTaskList} 
+        removeItem={removeTaskList} 
+        selectedIndex={selectedList} 
+        setSelectedIndex={setSelectedList} 
+      />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 p-4">
         <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
         {loading ? (
@@ -44,6 +67,19 @@ const ToDo = () => {
                       <td className="p-2 text-center">{todo.id}</td>
                       <td className="p-2">{todo.title}</td>
                       <td className="p-2 text-center">{todo.completed ? "✅" : "❌"}</td>
+                      <td className="p-2">
+                      <select 
+                        value={taskAssignments[todo.id] ?? ""}
+                        onChange={(e) => assignTaskToList(todo.id, e.target.value ? Number(e.target.value) : null)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 rounded border"
+                      >
+                        <option value="">Select</option>
+                        {taskLists.map((list, index) => (
+                          <option key={index} value={index}>{list}</option>
+                        ))}
+                      </select>
+                    </td>
                     </tr>
                   ))}
                 </tbody>
