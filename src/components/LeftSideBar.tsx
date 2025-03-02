@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import close from "../assets/close.svg";
 import menu from "../assets/menu.svg";
 import add from "../assets/add.svg";
@@ -15,6 +15,12 @@ const LeftSideBar: React.FC<LeftSidebarProps> = ({ items, addItem, removeItem, s
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [newItem, setNewItem] = useState("");
     const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        if (selectedIndex === null) {
+            setSelectedIndex(-1);
+        }
+    }, [selectedIndex, setSelectedIndex]);
 
 
     const handleAddItem = () => {
@@ -36,19 +42,29 @@ const LeftSideBar: React.FC<LeftSidebarProps> = ({ items, addItem, removeItem, s
                 </button>
             )}
 
+            {isMenuOpen && (
+                <button
+                className="mt-16 fixed top-4 left-4 bg-gray-800 p-2 rounded-md shadow-md z-50 lg:hidden"
+                onClick={() => setIsMenuOpen(false)}
+            >
+                <img src={close} alt="close" className="w-6 h-6" />
+            </button>
+            )}
+
             <div
                 className={`mt-16 fixed top-0 left-0 h-full w-60 bg-gray-900 text-white p-5 shadow-lg transition-transform transform 
                 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
             >
-                <button
-                    className="lg:hidden self-end text-gray-400 text-xl mb-4"
-                    onClick={() => setIsMenuOpen(false)}
-                >
-                    <img src={close} alt="close" className="w-6 h-6" />
-                </button>
+                <h2 className="text-lg font-bold mb-4 mt-10 lg:mt-0 lg:hidden">Task Lists</h2>
 
-                <h2 className="text-lg font-bold mb-4">Task Lists</h2>
                 <ul>
+                <li
+                        className={`mb-3 flex justify-between items-center cursor-pointer hover:text-gray-400 pl-2
+                        ${selectedIndex === -1 ? "bg-orange-500 text-white p-2 rounded-md pr-0" : ""}`}
+                        onClick={() => setSelectedIndex(-1)}
+                    >
+                        All Tasks
+                    </li>
                     {items.map((item, index) => (
                         <li
                             key={index}
