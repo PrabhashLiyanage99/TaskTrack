@@ -7,6 +7,7 @@ import LeftSidebar from "../components/LeftSideBar";
 import AddTaskForm from "../components/AddTaskForm";
 import AddTaskButton from "../components/AddTaskButton";
 import TaskFilter from "../components/TaskFilters";
+import TaskSorter from "../components/TaskSorter";
 import bin from "../assets/bin.svg";
 
 const ToDo = () => {
@@ -20,6 +21,8 @@ const ToDo = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDate, setSelectedDate ] = useState<Date | null>(null);
+  const [sortOrder, setSortOrder ]  = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<"date" | "index">("index");
 
   // Fetch tasks
   useEffect(() => {
@@ -91,9 +94,24 @@ const ToDo = () => {
   })
   .filter((todo) => {
     if (!selectedDate) return true;
-    const taskDate = new Date(taskDates[todo.id]).toISOString().split("T")[0];
-    return taskDate === selectedDate.toISOString().split("T")[0];
-  });
+
+    const taskDate = taskDates[todo.id]
+        ? new Date(taskDates[todo.id]).toLocaleDateString("en-CA") 
+        : null;
+
+    const selectedFormattedDate = selectedDate.toLocaleDateString("en-CA");
+
+    return taskDate === selectedFormattedDate;
+});
+
+const sortedTasks = [...filteredTasks].sort((a, b) => {
+  if (sortBy === "date") {
+    return sortOrder === "asc"
+      ? new Date(taskDates[a.id]).getTime() - new Date(taskDates[b.id]).getTime()
+      : new Date(taskDates[b.id]).getTime() - new Date(taskDates[a.id]).getTime();
+  }
+  return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
+});
 
   // Task delete handler
   const handleDeleteTask = (taskId: number) => {
@@ -102,6 +120,7 @@ const ToDo = () => {
 
   return (
     <Layout todos={todos}>
+
       <TaskFilter 
       selectedStatus={selectedStatus} 
       setSelectedStatus={setSelectedStatus}
@@ -109,7 +128,14 @@ const ToDo = () => {
       setSelectedCategory={setSelectedList}
       categories={taskLists.map((name, index) => ({ id: index, name }))} 
       selectedDate={selectedDate}
-      setSelectedDate={setSelectedDate}/>
+      setSelectedDate={setSelectedDate}
+      sortOrder={sortOrder}
+      setSortOrder={setSortOrder}
+      sortBy={sortBy}
+      setSortBy={setSortBy}/>
+
+
+
       <LeftSidebar
         items={taskLists}
         addItem={(newList: string) => setTaskLists([...taskLists, newList])}
@@ -122,7 +148,8 @@ const ToDo = () => {
         selectedIndex={selectedList}
         setSelectedIndex={setSelectedList}
       />
-      <div className="flex flex-col items-center justify-center min-h-screen max-w-10xl bg-gray-800 p-4 lg:mt-0 md:mt-20 sm:mt-10">
+
+      <div className="flex flex-col items-center  min-h-screen max-w-10xl bg-gray-800 p-4 lg:mt-0 md:mt-20 sm:mt-10">
         <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
         {loading ? (
           <p className="text-lg font-medium text-gray-600">Loading...</p>
@@ -140,14 +167,14 @@ const ToDo = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTasks.length === 0 && (
+                {sortedTasks.length === 0 && (
                   <tr>
                     <td colSpan={5} className="p-4 text-center text-gray-600 font-bold">
                       No tasks in this category
                     </td>
                   </tr>
                 )}
-                {filteredTasks.slice(0, 10).map((todo) => (
+                {sortedTasks.slice(0, 10).map((todo)  =>(
                   <tr
                     key={todo.id}
                     className="cursor-pointer hover:bg-blue-100 transition-all"
