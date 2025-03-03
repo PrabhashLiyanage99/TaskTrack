@@ -6,6 +6,7 @@ import TaskChart from "../components/TaskChart";
 import LeftSidebar from "../components/LeftSideBar";
 import AddTaskForm from "../components/AddTaskForm";
 import AddTaskButton from "../components/AddTaskButton";
+import bin from "../assets/bin.svg";
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -16,7 +17,9 @@ const ToDo = () => {
   const [taskAssignments, setTaskAssignments] = useState<{ [key: number]: number | null }>({});
   const [taskDates, setTaskDates] = useState<{ [key: number]: Date }>({});
   const [isFormVisible, setIsFormVisible ] = useState(false);
+  const [taskDelete , setTaskDelete ] = useState< number | null>(null);
 
+//fetch tasks
   useEffect(() => {
     axios
       .get("https://jsonplaceholder.typicode.com/todos")
@@ -41,6 +44,7 @@ const ToDo = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  //add new task
   const handleAddTask = (title: string, category: string, dueDate: Date) => {
     const newTask = {
       id: todos.length + 1,
@@ -52,6 +56,7 @@ const ToDo = () => {
     setTodos([...todos, newTask]);
   };
 
+  //generate random date for all tasks
   const generateRandomDate = () => {
     const start = new Date(2024, 11, 27);
     const end = new Date(2025, 4, 30);
@@ -63,11 +68,17 @@ const ToDo = () => {
     return date.toLocaleDateString("en-US", options);
   };
 
+  //get task lenth for chart drawing in small screens
   const totalTasks = todos.length;
   const completedTasks = todos.filter((todo) => todo.completed).length;
 
   const filteredTasks =
     selectedList === -1 ? todos : todos.filter((todo) => taskAssignments[todo.id] === selectedList);
+
+  //task delete
+  const handleDeleteTask = (taskId: number) => {
+    setTodos(todos.filter((todo) => todo.id !== taskId));
+  };
 
   return (
     <Layout todos={todos}>
@@ -83,20 +94,21 @@ const ToDo = () => {
         selectedIndex={selectedList}
         setSelectedIndex={setSelectedList}
       />
-      <div className="flex flex-col items-center justify-center min-h-screen max-w-10xl bg-gray-800 p-4">
+      <div className="flex flex-col items-center justify-center min-h-screen max-w-10xl bg-gray-800 p-4 lg:mt-0 md:mt-20 sm:mt-10">
         <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
         {loading ? (
           <p className="text-lg font-medium text-gray-600">Loading...</p>
         ) : (
-          <div className="overflow-x-auto w-full max-w-4xl bg-white shadow-xl rounded-lg p-4">
+          <div className="overflow-x-auto w-full max-w-4xl bg-white shadow-xl rounded-lg lg:p-4">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-500 text-white">
+                <tr className="bg-gray-500 text-white w-full">
                   <th className="p-2 hidden md:table-cell">ID</th>
                   <th className="p-2">Title</th>
                   <th className="p-2">Completed</th>
                   <th className="p-2 hidden md:table-cell">Category</th>
                   <th className="p-2 hidden md:table-cell">Due Date</th>
+                  <th className="p-2 "></th>
                 </tr>
               </thead>
               <tbody>
@@ -131,19 +143,31 @@ const ToDo = () => {
                         ))}
                       </select>
                     </td>
-                    <td className="p-2 text-center hidden md:table-cell">{formatDate(taskDates[todo.id])}</td>
+                    <td className="p-2 text-center hidden md:table-cell">
+                      {formatDate(taskDates[todo.id])}
+                    </td>
+                    <td className="p-2 text-center">
+                      <button onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTask(todo.id);
+                        }}
+                        >
+                          <img src={bin} alt="delete" className="w-6 h-6 hidden md:table-cell brightness-75 hover:brightness-100" />
+
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <AddTaskButton onClick={() => setIsFormVisible(true)} />
         {isFormVisible && <AddTaskForm taskLists={taskLists} onAddTask={handleAddTask} onClose={() => setIsFormVisible(false)} />}
-            <div className="block lg:hidden">
-              <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
-            </div>
           </div>
         )}
         {selectedTodo && <TodoCard todo={selectedTodo} onClose={() => setSelectedTodo(null)} />}
+        <div className="block lg:hidden mt-10 overflow-x-auto w-full max-w-4xl shadow-xl rounded-lg lg:p-4">
+              <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
+        </div>
       </div>
       
     </Layout>
