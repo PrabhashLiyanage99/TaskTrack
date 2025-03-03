@@ -23,7 +23,7 @@ interface LayoutProps {
         <div className="flex-1 flex flex-col overflow-y-auto scrollbar-hide">
           <Header />
           
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 lg:p-6 lg:mr-16">{children}</main>
         </div>
       </div>
     );
