@@ -91,7 +91,7 @@ const LeftSideBar: React.FC<LeftSidebarProps> = ({ items, addItem, removeItem, s
                         onClick={() => setIsAdding(true)}
                         className="mt-4 w-auto hover:bg-orange-600 text-white p-2 rounded-md flex items-center gap-3"
                     >
-                        <img src={add} alt="add" className="w-6 h-6" /> Add New List
+                        <img src={add} alt="add" className="w-6 h-6" /> Add New Category
                     </button>
                 )}
                 {isAdding && (
