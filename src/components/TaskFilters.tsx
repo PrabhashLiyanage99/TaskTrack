@@ -41,7 +41,7 @@ const TaskFilter: React.FC<TaskFilterProps> = ({
     };
 
     return (
-        <div className="flex flex-wrap gap-2 p-6 bg-gray-800 text-white rounded-lg shadow-lg border border-gray-700 justify-center items-center mt-10">
+        <div className="flex flex-wrap gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-lg border border-gray-700 justify-center items-center mt-10">
             {/* Status Filter */}
             <div className="flex flex-col items-start">
                 <label className="text-sm font-medium mb-1">Status</label>
