@@ -10,7 +10,7 @@ const AddTaskButton: React.FC<AddTaskButtonProps> = ({ onClick }) => {
     <div className="fixed bottom-10 lg:right-72">
       <button
         onClick={onClick}
-        className="bg-orange-500 p-2 rounded-full shadow-lg hover:bg-orange-600 flex items-center justify-center"
+        className="bg-orange-500 p-2 rounded-full shadow-lg hover:bg-orange-600 flex items-center justify-center z-50"
         title="Add Task"
       >
         <img src={add} alt="Add Task" className="w-10 h-10" />

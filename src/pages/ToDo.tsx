@@ -10,6 +10,7 @@ import TaskFilter from "../components/TaskFilters";
 import Popup from "../components/Popup";
 import bin from "../assets/bin.svg";
 import arrow from "../assets/left-arrow.svg"
+import TaskCalendar from "../components/TaskCalendar";
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -53,6 +54,11 @@ const ToDo = () => {
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
+
+  // Reset to the first page whenever filters change
+  useEffect(() => {
+    setCurrentPage(1); 
+  }, [selectedStatus, selectedList, selectedDate, sortOrder, sortBy]);
 
   // Add new task
   const handleAddTask = (title: string, category: string, dueDate: Date) => {
@@ -182,12 +188,12 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
         setSelectedIndex={setSelectedList}
       />
 
-      <div className="flex flex-col items-center  min-h-screen max-w-10xl bg-gray-800 p-4 lg:mt-0 md:mt-20 sm:mt-10">
-        <h2 className="text-2xl font-bold mb-4">ToDo List</h2>
+      <div className="flex flex-col items-center  min-h-screen max-w-10xl bg-gray-800 p-4 lg:mt-0 mb:mt-0 ">
+        <h2 className="text-2xl font-bold mb-4 text-white">Tasks List</h2>
         {loading ? (
           <p className="text-lg font-medium text-gray-600">Loading...</p>
         ) : (
-          <div className="overflow-x-auto w-full max-w-4xl bg-white shadow-xl rounded-lg lg:p-4">
+          <div className="overflow-x-auto w-full max-w-4xl bg-gray-700 shadow-xl rounded-lg lg:p-4 text-white">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-500 text-white w-full">
@@ -200,9 +206,9 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                 </tr>
               </thead>
               <tbody>
-                {currentTasks.length === 0 && (
+                {filteredTasks.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-4 text-center text-gray-600 font-bold">
+                    <td colSpan={5} className="p-4 text-center text-white font-bold">
                       No tasks in this category
                     </td>
                   </tr>
@@ -210,7 +216,7 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                 {currentTasks.map((todo)  =>(
                   <tr
                     key={todo.id}
-                    className="cursor-pointer hover:bg-blue-100 transition-all"
+                    className="cursor-pointer hover:bg-orange-400 transition-all"
                     onClick={() => setSelectedTodo(todo)}
                   >
                     <td className="p-2 hidden md:table-cell text-center">{todo.id}</td>
@@ -230,7 +236,7 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                         value={taskAssignments[todo.id] ?? ""}
                         onChange={(e) => setTaskAssignments((prev) => ({ ...prev, [todo.id]: e.target.value ? Number(e.target.value) : null }))}
                         onClick={(e) => e.stopPropagation()}
-                        className="p-1 rounded border w-auto"
+                        className="p-1 rounded border w-auto bg-gray-700"
                       >
                         <option value="">Uncategorized</option>
                         {taskLists.map((list, index) => (
@@ -308,8 +314,13 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             </button>
           </div>
         </div>
-        <div className="block lg:hidden mt-10">
-          <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
+        <div className="md:flex">
+          <div className="block lg:hidden mt-10 md:gap-20">
+            <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
+          </div>
+          <div className="block lg:hidden mt-10 md:mt-0">
+            <TaskCalendar dueDates={todos.map(todo => todo.taskDate)} />
+          </div>
         </div>
       </div>
     </Layout>
