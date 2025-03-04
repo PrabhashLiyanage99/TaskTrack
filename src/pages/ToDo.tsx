@@ -9,6 +9,7 @@ import AddTaskButton from "../components/AddTaskButton";
 import TaskFilter from "../components/TaskFilters";
 import Popup from "../components/Popup";
 import bin from "../assets/bin.svg";
+import arrow from "../assets/left-arrow.svg"
 
 const ToDo = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -25,6 +26,8 @@ const ToDo = () => {
   const [sortBy, setSortBy] = useState<"date" | "index">("index");
   const [selectedTask, setSelectedTask] = useState<{ id: number; completed: boolean } | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const taskPerPage = 10
 
   // Fetch tasks
   useEffect(() => {
@@ -143,6 +146,13 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
     setSelectedTask(null);
   };
 
+  //pagination logic
+  const indexOfLastTask = currentPage * taskPerPage;
+  const indexOfFirstTask = indexOfLastTask - taskPerPage;
+  const currentTasks = sortedTasks.slice(indexOfFirstTask, indexOfLastTask);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <Layout todos={todos}>
 
@@ -190,14 +200,14 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                 </tr>
               </thead>
               <tbody>
-                {sortedTasks.length === 0 && (
+                {currentTasks.length === 0 && (
                   <tr>
                     <td colSpan={5} className="p-4 text-center text-gray-600 font-bold">
                       No tasks in this category
                     </td>
                   </tr>
                 )}
-                {sortedTasks.slice(0, 10).map((todo)  =>(
+                {currentTasks.map((todo)  =>(
                   <tr
                     key={todo.id}
                     className="cursor-pointer hover:bg-blue-100 transition-all"
@@ -278,6 +288,26 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             onClose={() => setSelectedTodo(null)}
 
             />}
+          <div className=" bottom-0 left-0 right-0 py-4 shadow-lg ">
+          <div className="flex justify-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 mx-1 bg-orange-500 text-white rounded disabled:bg-gray-300 w-28 flex items-center justify-center space-x-1" 
+            >
+              <img src={arrow} alt="arrow" className="w-5 h-5 inline-block mr-2" />
+              <span>Previous</span>
+            </button>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={indexOfLastTask >= sortedTasks.length}
+              className="px-4 py-2 mx-1 bg-orange-500 text-white rounded disabled:bg-gray-300 w-28 flex items-center justify-center space-x-1" 
+            >
+              <span>Next</span>
+              <img src={arrow} alt="arrow" className="w-5 h-5 rotate-180 inline-block ml-2" />
+            </button>
+          </div>
+        </div>
         <div className="block lg:hidden mt-10">
           <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
         </div>
