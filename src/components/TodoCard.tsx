@@ -83,7 +83,7 @@ const TodoCard: React.FC<TodoCardProps> = ({
           className="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700 transition"
           onClick={handleAdd} 
         >
-          Add
+          Set Changers
         </button>
       </div>
     </div>
