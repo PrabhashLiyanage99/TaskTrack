@@ -7,7 +7,7 @@ import LeftSidebar from "../components/LeftSideBar";
 import AddTaskForm from "../components/AddTaskForm";
 import AddTaskButton from "../components/AddTaskButton";
 import TaskFilter from "../components/TaskFilters";
-import TaskSorter from "../components/TaskSorter";
+import Popup from "../components/Popup";
 import bin from "../assets/bin.svg";
 
 const ToDo = () => {
@@ -23,6 +23,8 @@ const ToDo = () => {
   const [selectedDate, setSelectedDate ] = useState<Date | null>(null);
   const [sortOrder, setSortOrder ]  = useState<"asc" | "desc">("asc");
   const [sortBy, setSortBy] = useState<"date" | "index">("index");
+  const [selectedTask, setSelectedTask] = useState<{ id: number; completed: boolean } | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   // Fetch tasks
   useEffect(() => {
@@ -114,8 +116,31 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
 });
 
   // Task delete handler
-  const handleDeleteTask = (taskId: number) => {
-    setTodos(todos.filter((todo) => todo.id !== taskId));
+  const handleConfirmDelete = () => {
+    setTodos(todos.filter((todo) => todo.id !== taskToDelete));
+    setTaskToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setTaskToDelete(null);
+  };
+
+  const handleShowPopup = (taskId: number) => {
+    const task = todos.find((todo) => todo.id === taskId);
+    if (task) setSelectedTask(task);
+  };
+
+  const handleConfirmChange = () => {
+    if (selectedTask) {
+      setTodos(
+        todos.map((todo) => todo.id === selectedTask.id ?{...todo, completed: !todo.completed } : todo)
+      );
+    }
+    setSelectedTask(null);
+  };
+
+  const handleCancel = () => {
+    setSelectedTask(null);
   };
 
   return (
@@ -133,8 +158,6 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
       setSortOrder={setSortOrder}
       sortBy={sortBy}
       setSortBy={setSortBy}/>
-
-
 
       <LeftSidebar
         items={taskLists}
@@ -182,7 +205,16 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                   >
                     <td className="p-2 hidden md:table-cell text-center">{todo.id}</td>
                     <td className="p-2">{todo.title}</td>
-                    <td className="p-2 text-center">{todo.completed ? "✅" : "❌"}</td>
+                    <td className="p-2 text-center">
+                      <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowPopup(todo.id);
+                      }}
+                      className="text-xl">
+                        {todo.completed ?  "✅" : "❌"}
+                      </button>
+                    </td>
                     <td className="p-2 hidden md:table-cell">
                       <select
                         value={taskAssignments[todo.id] ?? ""}
@@ -205,7 +237,7 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteTask(todo.id);
+                          setTaskToDelete(todo.id);
                         }}
                       >
                         <img src={bin} alt="delete" className="w-6 h-6 hidden md:table-cell brightness-75 hover:brightness-100" />
@@ -215,11 +247,37 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
                 ))}
               </tbody>
             </table>
+            {selectedTask && (
+              <Popup
+                message={`Are you sure you want to mark this task as ${
+                  selectedTask.completed ? "Pending ❌" : "Completed ✅"
+                }?`}
+                onConfirm={handleConfirmChange}
+                onCancel={handleCancel}
+              />
+            )}
+            {taskToDelete && (
+              <Popup
+              message="Are you sure you want to delete this task?"
+              onConfirm={handleConfirmDelete}
+              onCancel={handleCancelDelete}
+            />
+            )}
             <AddTaskButton onClick={() => setIsFormVisible(true)} />
             {isFormVisible && <AddTaskForm taskLists={taskLists} onAddTask={handleAddTask} onClose={() => setIsFormVisible(false)} />}
           </div>
         )}
-        {selectedTodo && <TodoCard todo={selectedTodo} onClose={() => setSelectedTodo(null)} />}
+        {selectedTodo && 
+          <TodoCard 
+            todo={selectedTodo}
+            taskLists={taskLists}
+            taskAssignments={taskAssignments}
+            setTaskAssignments={setTaskAssignments}
+            taskDates={taskDates}
+            setTaskDates={setTaskDates}
+            onClose={() => setSelectedTodo(null)}
+
+            />}
         <div className="block lg:hidden mt-10">
           <TaskChart totalTaskCount={totalTasks} doneTaskCount={completedTasks} />
         </div>

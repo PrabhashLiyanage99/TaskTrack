@@ -15,8 +15,8 @@ interface TaskFilterProps {
     setSortBy: (by: "date" | "index") => void;
 }
 
-const TaskFilter: React.FC<TaskFilterProps> = ({ 
-    selectedStatus, 
+const TaskFilter: React.FC<TaskFilterProps> = ({
+    selectedStatus,
     setSelectedStatus,
     selectedCategory,
     setSelectedCategory,
@@ -26,12 +26,10 @@ const TaskFilter: React.FC<TaskFilterProps> = ({
     sortOrder,
     setSortOrder,
     sortBy,
-    setSortBy
- }) => {
-
+    setSortBy,
+}) => {
     const handleTodayFilter = () => {
-        const today = new Date();
-        setSelectedDate(today);
+        setSelectedDate(new Date());
     };
 
     const resetFilters = () => {
@@ -39,66 +37,78 @@ const TaskFilter: React.FC<TaskFilterProps> = ({
         setSelectedCategory(null);
         setSelectedDate(null);
         setSortOrder("asc");
-    }
-    
+        setSortBy("index");
+    };
+
     return (
-        <div className="flex p-2 bg-gray-800 rounded-lg flex-row items-center justify-center mt-20 gap-2">
-          {/* Status Filter */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="p-2 border rounded bg-gray-900 text-white"
-          >
-            <option value="">All</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-          </select>
-    
-          {/* Category Filter */}
-          <select
-            value={selectedCategory ?? ""}
-            onChange={(e) => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
-            className="p-2 border rounded bg-gray-900 text-white"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-lg border border-gray-700 justify-center items-center mt-10">
+            {/* Status Filter */}
+            <div className="flex flex-col items-start">
+                <label className="text-sm font-medium mb-1">Status</label>
+                <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="p-2 border rounded bg-gray-700 text-white focus:ring-2 focus:ring-orange-400"
+                >
+                    <option value="">All</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
 
-          {/* Date Filter */}
-          <input
-            type="date"
-            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""} 
-            onChange={(e) => setSelectedDate(e.target.value ? new Date(e.target.value) : null)} 
-            className="p-2 border rounded bg-gray-900 text-white"
-          />
+            {/* Category Filter */}
+            <div className="flex flex-col items-start">
+                <label className="text-sm font-medium mb-1">Category</label>
+                <select
+                    value={selectedCategory ?? ""}
+                    onChange={(e) =>
+                        setSelectedCategory(e.target.value ? Number(e.target.value) : null)
+                    }
+                    className="p-2 border rounded bg-gray-700 text-white focus:ring-2 focus:ring-orange-400"
+                >
+                    <option value="">All Categories</option>
+                    {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-          <TaskSorter 
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            sortBy={sortBy}
-            setSortBy={setSortBy} 
-          />
+            {/* Date Filter */}
+            <div className="flex flex-col items-start">
+                <label className="text-sm font-medium mb-1">Date</label>
+                <input
+                    type="date"
+                    value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+                    onChange={(e) =>
+                        setSelectedDate(e.target.value ? new Date(e.target.value) : null)
+                    }
+                    className="p-2 border rounded bg-gray-700 text-white focus:ring-2 focus:ring-orange-400"
+                />
+            </div>
 
-          <button 
-            onClick={handleTodayFilter}
-            className="p-2 ml-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-          >
-            Today
-          </button>
+            {/* Sorting Component */}
+            <TaskSorter sortOrder={sortOrder} setSortOrder={setSortOrder} sortBy={sortBy} setSortBy={setSortBy} />
 
-          {/* Reset Filters */}
-          <button 
-            onClick={resetFilters}
-            className="p-2 ml-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Reset Filters
-          </button>
+            {/* Buttons in One Row */}
+            <div className="flex gap-3">
+                <button
+                    onClick={handleTodayFilter}
+                    className="p-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
+                >
+                    Today
+                </button>
+
+                <button
+                    onClick={resetFilters}
+                    className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                >
+                    Reset Filters
+                </button>
+            </div>
         </div>
-      );
+    );
 };
 
 export default TaskFilter;
